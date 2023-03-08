@@ -20,7 +20,7 @@ namespace UpSwot_Test.DAL.Repositories
 
         public async Task<bool> IsExistCharacterWithNameAsync(string? name)
         {
-            return name != null && (await GetCharactersByNameAsync(name)).Count > 0;
+            return name != null && (await GetCharactersByNameAsync(name).ConfigureAwait(false)).Count > 0;
         }
 
         public async Task<List<Character>> GetCharactersByNameAsync(string name)
@@ -32,7 +32,8 @@ namespace UpSwot_Test.DAL.Repositories
             while (nextPageUri != null)
             {
                 var nextPageCharacterJson =
-                    await GetDeserializedCharacterJsonByUriAsync(nextPageUri);
+                    await GetDeserializedCharacterJsonByUriAsync(nextPageUri)
+                    .ConfigureAwait(false);
 
                 if (nextPageCharacterJson?.Characters == null)
                 {
@@ -46,7 +47,8 @@ namespace UpSwot_Test.DAL.Repositories
 
             foreach (var character in charactersList)
             {
-                character.Origin = await locationRepository.GetByUriAsync(character.Origin?.Url);
+                character.Origin = await locationRepository.GetByUriAsync(character.Origin?.Url)
+                    .ConfigureAwait(false);
 
                 if (character.LinkEpisode == null)
                 {
@@ -55,7 +57,8 @@ namespace UpSwot_Test.DAL.Repositories
 
                 var result = await Task.WhenAll(character.LinkEpisode
                     .Select(async episodeLink => await episodeRepository
-                    .GetByUriAsync(episodeLink)));
+                    .GetByUriAsync(episodeLink)
+                    .ConfigureAwait(false)));
 
                 character.ObjectEpisodes.AddRange(result!);
             }
@@ -67,9 +70,9 @@ namespace UpSwot_Test.DAL.Repositories
 
         private async Task<CharacterJson?> GetDeserializedCharacterJsonByUriAsync(string uri)
         {
-            var result = await http.GetAsync(uri);
+            var result = await http.GetAsync(uri).ConfigureAwait(false);
 
-            var charactersJson = await result.Content.ReadAsStringAsync();
+            var charactersJson = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<CharacterJson?>(charactersJson);
         }

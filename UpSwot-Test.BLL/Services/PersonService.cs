@@ -22,13 +22,14 @@ namespace UpSwot_Test.BLL.Services
 
         public async Task<bool?> CheckPersonAsync(CheckPersonModel names)
         {
-            if (!(await characterRepository.IsExistCharacterWithNameAsync(names.PersonName)) ||
-                !(await episodeRepository.IsExistEpisodeWithNameAsync(names.EpisodeName)))
+            if (!(await characterRepository.IsExistCharacterWithNameAsync(names.PersonName).ConfigureAwait(false)) ||
+                !(await episodeRepository.IsExistEpisodeWithNameAsync(names.EpisodeName).ConfigureAwait(false)))
             {
                 return null;
             }
 
-            var characters = await characterRepository.GetCharactersByNameAsync(names.PersonName!);
+            var characters = await characterRepository.GetCharactersByNameAsync(names.PersonName!)
+                .ConfigureAwait(false);
 
             return characters
                 .Any(character => character.ObjectEpisodes
@@ -37,7 +38,7 @@ namespace UpSwot_Test.BLL.Services
 
         public async Task<CharacterModel?> GetPersonAsync(string name)
         {
-            var person = (await characterRepository.GetCharactersByNameAsync(name))?
+            var person = (await characterRepository.GetCharactersByNameAsync(name).ConfigureAwait(false))?
                 .FirstOrDefault(person => person.Name == name);
 
             return person == null ? null : mapper.Map(person);

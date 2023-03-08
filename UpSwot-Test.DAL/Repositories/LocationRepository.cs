@@ -8,13 +8,13 @@ namespace UpSwot_Test.DAL.Repositories
         public LocationRepository(HttpClient http) : base(http) { }
 
         public async Task<Location?> GetByUriAsync(string? uri) =>
-            await GetDeserializedLocationByUriAsync(uri);
+            await GetDeserializedLocationByUriAsync(uri).ConfigureAwait(false);
 
         private async Task<Location?> GetDeserializedLocationByUriAsync(string? uri)
         {
-            var result = await http.GetAsync(uri);
+            var result = await http.GetAsync(uri).ConfigureAwait(false);
 
-            var location = await result.Content.ReadAsStringAsync();
+            var location = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<Location?>(location);
         }

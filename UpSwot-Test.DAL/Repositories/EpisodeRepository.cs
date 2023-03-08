@@ -8,11 +8,11 @@ namespace UpSwot_Test.DAL.Repositories
         public EpisodeRepository(HttpClient http) : base(http) { }
 
         public async Task<Episode?> GetByUriAsync(string uri) =>
-           await GetDeserializedEpisodeByUriAsync<Episode>(uri);
+           await GetDeserializedEpisodeByUriAsync<Episode>(uri).ConfigureAwait(false);
 
         public async Task<bool> IsExistEpisodeWithNameAsync(string? name)
         {
-            return name != null && (await GetEpisodesByNameAsync(name)).Count > 0;
+            return name != null && (await GetEpisodesByNameAsync(name).ConfigureAwait(false)).Count > 0;
         }
 
         public async Task<List<Episode>> GetEpisodesByNameAsync(string name)
@@ -24,7 +24,8 @@ namespace UpSwot_Test.DAL.Repositories
             while (nextPageUri != null)
             {
                 var nextPageEpisodeJson =
-                    await GetDeserializedEpisodeByUriAsync<EpisodeJson>(nextPageUri);
+                    await GetDeserializedEpisodeByUriAsync<EpisodeJson>(nextPageUri)
+                    .ConfigureAwait(false);
 
                 if (nextPageEpisodeJson?.Episodes == null)
                 {
@@ -43,9 +44,9 @@ namespace UpSwot_Test.DAL.Repositories
 
         private async Task<TEntity?> GetDeserializedEpisodeByUriAsync<TEntity>(string uri)
         {
-            var result = await http.GetAsync(uri);
+            var result = await http.GetAsync(uri).ConfigureAwait(false);
 
-            var episode = await result.Content.ReadAsStringAsync();
+            var episode = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             return JsonConvert.DeserializeObject<TEntity?>(episode);
         }
