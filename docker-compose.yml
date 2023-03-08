@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  upswot-test.api:
+    image: ${DOCKER_REGISTRY-}upswottestapi
+    build:
+      context: .
+      dockerfile: UpSwot-Test.API/Dockerfile
+    ports:
+    - 8080:80
